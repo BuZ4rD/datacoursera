@@ -1,0 +1,150 @@
+---
+title: "PollutionTest"
+author: "Mathias"
+date: "03/09/2020"
+output: html_document
+---
+
+1 / POLLUTANT MEAN
+
+Hard time for this one, a long time passed to get good functions for file finding.
+
+Here is the function to list all the files:
+```{r}
+
+listfiles <- function(directory = "specdata"){
+  
+  #list files in my directory
+  list.files(directory,full.names = TRUE)
+}
+
+```
+
+
+Struggling with binding, but finally :
+
+```{r}
+pollutantmean<-function(directory = "specdata",pollutant,id=1:332){
+  
+  #list files in my directory
+  myfiles <- listfiles(directory)
+
+  #create an empty data frame
+  mydata <- data.frame()
+  
+  #loop through the list of files until id is found
+  for(i in id){
+    #read in the file
+    temp <- read.csv(myfiles[i])
+    #add files to the main data frame
+    mydata<-rbind(mydata,temp)
+  }
+  
+  #compute the mean
+  return(mean(mydata[,pollutant],na.rm = TRUE))
+  
+}
+  
+x <- pollutantmean("specdata", "sulfate", 1:10)
+print (x)
+y <- pollutantmean("specdata", "nitrate", 70:72)
+print (y)
+z <- pollutantmean("specdata", "sulfate", 34)
+print (z)
+w <- pollutantmean("specdata", "nitrate")
+print (w)
+
+
+```
+
+2 / COMPLETE R
+
+
+Easier as all the job as already been done in the previous function
+
+
+```{r pressure, echo=FALSE}
+complete <- function(directory = "specdata",id=1:332){
+  
+  #list files in my directory
+  myfiles <- listfiles(directory)
+
+  #create an empty data frame
+  mydata <- data.frame()
+  
+  for(i in id){
+    #read in the file, without na and count the row
+    tempRows <- nrow (na.omit(read.csv(myfiles[i])))
+
+    # add to my data table the result of the ids and number
+    mydata <- rbind(mydata,data.frame(i,tempRows))
+  }
+  
+  # rename the columns
+  dimnames(mydata)[[2]] <- c("id","nobs")
+  return(mydata)
+}
+
+## tests
+complete("specdata", 30:25)
+
+cc <- complete("specdata", c(6, 10, 20, 34, 100, 200, 310))
+print(cc$nobs)
+
+cc <- complete("specdata", 54)
+print(cc$nobs)
+```
+3 / Correlation
+
+
+
+```{r}
+
+corr <- function(directory, threshold = 150){
+  
+  ## call the previous complete function
+  datacomplete <- complete() # directory already set + id for all files
+  
+  ## threshold
+  datacomplete = datacomplete[(datacomplete$nobs>threshold),]
+  
+  
+  ## empty vector
+  finaldata <- vector(mode = "numeric", length = 0)
+
+  ## call the files
+  myfiles <- listfiles()
+  numbfile <- length(myfiles)
+  
+  for (i in 1:numbfile){
+    ## condition with complete datatable
+    if (i %in% datacomplete[,"id"]){
+      
+      #read in the file, without na and count the row
+      tempRows <- na.omit(read.csv(myfiles[i]))
+      
+      ## concatenate findings in my finaldata file
+      finaldata <- c(finaldata, cor(tempRows$nitrate, tempRows$sulfate))
+      
+      }
+  }
+  return (finaldata)
+}
+
+cr <- corr("specdata", 600)
+summary((cr))
+
+```
+```{r}
+
+##Tests:
+  
+cr <- corr("specdata")                
+cr <- sort(cr)   
+RNGversion("3.5.1")
+set.seed(868)                
+out <- round(cr[sample(length(cr), 5)], 4)
+print(out)
+
+
+```

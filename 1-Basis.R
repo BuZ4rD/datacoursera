@@ -162,7 +162,7 @@ x$a
 x<- matrix(1:6,2,3)
 x[1,2]
 x[1,2,drop=F]
-
+x[(<1),]
 x[1, , drop=T]
 
 
@@ -175,7 +175,7 @@ x[["a", exact=F]]
 
 ## Removing NA Values
 
-x <- c(1,2,NA,4,NA,5)
+x<- c(1,2,NA,4,NA,5)
 bad = is.na(x)
 x[!is.na(x)]
 x[!bad]
@@ -185,6 +185,7 @@ good = complete.cases(x,y)
 x[good]
 y[good]
 
+airquality = read.csv("hw1_data.csv")
 x = read.csv("hw1_data.csv")
 names(x)
 x

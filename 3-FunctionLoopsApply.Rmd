@@ -1,0 +1,87 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+lapply and sapply
+
+```{r}
+addos <- 
+mylist <- 1:10
+
+## return whatever a simplification of a list
+sapply(mylist, function(x){x+5})
+
+## return a list
+lapply(mylist, function(x){x+5})
+
+```
+Apply
+
+replace loop for matrix and array and dataframe
+
+
+```{r}
+x <- matrix(rnorm(200), 20, 10)
+x
+# mean
+apply(x, 2, mean)
+## sum
+apply(x, 1, sum)
+```
+```{r}
+rowSums(x)
+rowMeans(x)
+colSums(x)
+colMeans(x)
+```
+Quantile
+```{r}
+apply(x,1,quantile, probs = c(0.25,0.75))
+```
+
+```{r}
+apply(x, c(1,2), mean)
+
+```
+Mapply
+multivariate apply
+str(mapply)
+function (FUN, .., MoreArgs = NULL, USE NAMES = TRUE)
+
+
+```{r}
+rep(1:4, each = 1, len = 40)
+x <- factor(LETTERS[1:4]); names(x) <- letters[1:4]
+x
+rep(x, 2)
+
+
+mapply(rep, 1:4, 4:1)
+```
+Vectorizing function with mapply
+
+```{r}
+noise <- function(n,mean, sd){
+  rnorm(n, mean, sd)
+}
+noise (5,1,2)
+
+noise(1:5, 1:5, 2)
+
+mapply(noise,1:5, 1:5, 2)
+```
+tapply
+function over subsets
+
+```{r}
+x <- c(rnorm(10), runif(10), rnorm(10,1))
+f <- gl(3,10)
+f
+
+x
+tapply(x, f, mean)
+
+tapply(x, f, mean, simplify =  FALSE)
+```
+
