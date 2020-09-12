@@ -1,0 +1,158 @@
+---
+title: "EDA"
+output: html_notebook
+---
+
+# Generic rules
+## Definition
+
+### Agglomerative approach:
+- find closest two things
+- put them ogtether
+- find next closer
+
+### Requires
+- defined distance
+- merging approach
+
+### Produces
+- tree showing how close things are to each other
+
+### How do we deine close:
+- garbage in -> garbage out
+- Distance or similarity
+  - euclidian
+  - continuous
+  - binary
+  
+### Example :
+ - Manhattan distance
+
+
+## Practice
+### Generate dataset example
+
+```{r}
+set.seed(1234)
+par(mar = c(0,0,0,0))
+x <- rnorm(12, mean = rep(1:3, each = 4), sd=0.2)
+y <- rnorm(12, mean = rep(c(1,2,1), each = 4), sd=0.2)
+plot(x,y,col="blue", pch=19, cex=2)
+text(x + 0.05, y + 0.05, labels=as.character(1:12))
+```
+
+### Generate dataframe
+```{r}
+dataFrame <- data.frame(x,y)
+dist(dataFrame)
+```
+
+#### hClust
+```{r}
+distxy <- dist(dataFrame)
+hclust <- hclust(distxy)
+plot(hclust)
+```
+
+#### Prettier dendrogram
+```{r}
+myhclust <- function(hclust, lab = hclust$labels, lab.col=rep(1, length(hclust$labels)),
+                     hang = 0.1,...){
+  y <- rep(hclust$height, 2)
+  x <- as.numeric(hclust$merge)
+  y <- y[which(x<0)]
+  x <- x[which(x<0)]
+  x <- abs(x)
+  y <- y[order(x)]
+  x <- x[order(x)]
+  plot(hclust, labels = FALSE, hang = hang, ...)
+  text(x = x, y = y[hclust$order] - (max(hclust$height)*hang), labels=lab[hclust$order], col=lab.col[hclust$order], srt=90,adj=c(1,0.5), xpd = NA, ...)
+}
+
+myhclust(hclust=hclust, lab = rep(1:3, each = 4), lab.col = rep(1:3, each = 4))
+```
+
+### HeatMap
+
+```{r}
+dataMatrix <- as.matrix(dataFrame)[sample(1:12),]
+heatmap(dataMatrix)
+
+```
+
+### K-means
+
+Same for clusering general definiton, how do we define close...
+
+Partitionning apporach
+- Fix a number of clusters
+- Get centroïds of each cluster
+- Assign things to closest centroïd
+- recalculate centroïds
+
+Requires
+- A defined distance metric
+- numùber of clusters
+- an intial gusse of centroïds location
+
+Produces:
+- Final centroid locaotion
+- assignement of each points to cluster
+```{r}
+kmeansDF <- kmeans(dataFrame, centers = 3)
+kmeansDF
+```
+
+### HeatMap
+```{r}
+kmeansDF <- kmeans(dataMatrix, centers = 3)
+par(mfrow = c(1,2), mar=c(2,4,0.1,0.1))
+image(t(dataMatrix)[, nrow(dataMatrix):1], yaxt = "n")
+image(t(dataMatrix)[, order(kmeansDF$cluster)], yaxt = "n")
+
+```
+
+## Dimension Reduction
+
+
+  
+```{r}
+set.seed(12345)
+par(mar=rep(0.2,4))
+dataMatrix1 <- matrix(rnorm(400), nrow=40)
+image(1:10, 1:40, t(dataMatrix1)[,nrow(dataMatrix1):1])
+
+```
+
+```{r}
+par(mar = rep(0.2,4))
+heatmap(dataMatrix1)
+```
+### Add a pattern
+```{r}
+for (i in 1:40){
+  # flip a coin
+  coinFlip <- rbinom(1, size = 1, prob = 0.5)
+  # if coin is head ass a common pattern to that row
+  dataMatrix1[i,] <- dataMatrix1[i,] + rep(c(0,3), each = 5)
+}
+
+par(mar = rep(0.2,4))
+heatmap(dataMatrix1)
+
+```
+
+```{r}
+hh <- hclust(dist(dataMatrix1))
+dataMatrix1Ordered <- dataMatrix1[hh$order,]
+par(mar = rep(0.2,4))
+image(t(dataMatrix1Ordered)[, nrow(dataMatrix1Ordered):1])
+plot(rowMeans(dataMatrix1Ordered), 40:1,  xlab = "Row Mean", ylab = "Row", pch = 19)
+plot(colMeans(dataMatrix1Ordered),xlab = "Column",  ylab = "Column mean",  pch = 19)
+```
+
+### Related problems
+Get rid of unwanted/useless data which is not
+
+### PCA/SVD
+SVD Matrix decomposition

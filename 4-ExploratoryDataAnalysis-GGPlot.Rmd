@@ -1,0 +1,162 @@
+---
+title: "EDA"
+output: html_notebook
+---
+
+
+
+### The GGPLOT2 System
+```{r}
+library(ggplot2)
+data(mpg)
+qplot(displ , hwy, data = mpg)
+
+
+```
+
+Grammar of Graphics (leland)
+Think, verbe, noun, adjective for graphics
+Therory of graphics enablers
+
+Stat graphics is a mapping of aestethic and geomteric objects
+
+Works well with "Factors"
+
+facets, stats, scales
+
+## QPLOT (quick plot)
+
+```{r, figures-side, fig.show="hold", out.width="50%"}
+str(mpg)
+
+
+```
+
+## Hello World
+```{r, figures-side, fig.show="hold", out.width="50%"}
+qplot(displ, hwy, data=mpg)
+
+
+```
+  ## Modify Aesthetic
+  
+```{r}
+qplot(displ, hwy, data = mpg, color = drv)
+```
+```{r}
+qplot(displ, hwy, data = mpg, geom=c("point", "smooth"))
+```
+
+1 variable = Histogram
+```{r}
+qplot(hwy, data = mpg, fill = drv)
+```
+```{r}
+qplot(displ, hwy, data = mpg, facets =. ~drv)
+```
+```{r}
+qplot(hwy, data = mpg, facets =drv ~., binwidth = 1)
+```
+```{r}
+
+qplot(hwy, data = mpg, fill = drv, binwidth = 1)
+```
+```{r}
+qplot(displ, hwy, data = mpg, color = class, geom=c("point", "smooth"), method = 'lm')
+
+
+``` 
+```{r}
+head(mpg)
+```
+```{r}
+library(ggplot2)
+g <- ggplot(mpg, aes(hwy, cty) )
+summary(g)
+
+```
+```{r}
+g <- ggplot(mpg, aes(cty, hwy) )
+p <- g  + geom_point(aes(color = cyl))+ geom_smooth(method = "lm", size=4, linetype = 3)+ facet_grid(. ~ model)
+l <- p + labs(title = "my graph", subtitle = "my graph 1 ")
+print(l)
+
+```
+```{r}
+library(datasets)
+data(airquality)
+
+qplot(Wind, Ozone, data = airquality, facets = . ~ factor(Month))
+
+
+```
+  
+```{r}
+airquality = transform(airquality, Month = factor(Month))
+qplot(Wind, Ozone, data = airquality, facets = . ~ Month)
+```
+```{r}
+qplot(Wind, Ozone, data = airquality, geom = "smooth")
+```
+```{r}
+library(ggplot2)
+
+library(ggplot2movies)
+g <- ggplot(movies, aes(votes, rating))
+p <- g  + geom_point(aes(color = votes)) + geom_smooth(method = "lm", size=4, linetype = 3)+ facet_grid(. ~ votes)
+class(p)
+print(g)
+
+qplot(votes, rating, data = movies, smooth = "loess")
+```
+
+
+```{r}
+
+g <- ggplot(mpg, aes(cty, hwy) )
+p <- g  + geom_point(aes(color = cyl))+ geom_smooth(method = "lm", size=4, linetype = 3)
+l <- p + labs(title = "my graph", subtitle = "my graph 1 ")
+print (p)
+```
+```{r}
+
+library(ggthemes) # Charger
+
+g <- ggplot(mpg, aes(cty, hwy) )
+p <- g  + geom_point(aes(color = cyl), color = "red")+ geom_smooth(method = "lm") + facet_grid(. ~ cyl)+ theme_economist()
+
+
+l <- p + labs(title = "my graph", subtitle = "my graph 1 ") + xlab("Dose (mg)") + ylab("Teeth length")
+print (l)
+```
+
+#### Axis Limits
+```{r}
+testdata <- data.frame(x = 1:100, y = rnorm(100))
+testdata[50,2] <- 100 ### outlier introduced
+g <- ggplot(testdata, aes(x = x, y = y))
+p <- g+geom_line()
+print(p)
+```
+#### Exclude Outlier
+```{r}
+
+p <- g + geom_line() + ylim (-3,3)
+print(p)
+```
+#### Inculude Outlier but frame on mydata
+```{r}
+p <- g + geom_line() + coord_cartesian(ylim = c(-3,3))
+print (p)
+```
+cutpoints <- quantile( mydata$xxx, seq(0,1, lenght = 4), na.rm = TRUE)
+
+```{r}
+
+g <- ggplot(mpg, aes(hwy, cty))
+p <- g + geom_point(alpha = 1/3) + facet_wrap(.~cyl, nrow = 2, ncol = 3) + geom_smooth(method = "lm", se=FALSE, col="steelblue") + theme_bw(base_family = "Avenir", base_size = 10) + labs(x = "yoyoyo") + labs(y = "Nocturnal Symptoms") + labs(title = "MAACS Cohort")
+print (p)
+
+```
+  
+  

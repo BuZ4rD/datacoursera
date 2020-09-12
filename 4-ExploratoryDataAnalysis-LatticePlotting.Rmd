@@ -1,0 +1,68 @@
+---
+title: "Lattice Plotting System"
+author: "Mathias"
+date: "11/09/2020"
+output: html_document
+---
+
+## The Lattice Plotting System
+
+xyplot,
+bwplot, box and whiskers
+levelplot, counterplot (image data)
+hitogram,
+stripplot (points)
+plotdots (like violin)
+
+
+-> single functin call
+```{r}
+
+library(lattice)
+library (datasets)
+
+```
+#### XYPLOT
+
+
+```{r}
+state <- data.frame(state.x77, region = state.region)
+xyplot(Life.Exp ~ Income | region, data = state, layout = c(4,1) )
+
+```
+
+```{r}
+airquality <- transform(airquality, Month = factor(Month))
+state <- data.frame(state.x77, region = state.region)
+xyplot(Ozone ~ Wind | Month, data = airquality, layout = c(5,1) )
+
+```
+
+
+
+
+```{r}
+
+f <- factor(f, labels = c("Group 1", "Group 2"))
+xyplot(y ~ x | f, layout = c(2,1))
+
+```
+Regression Line
+```{r}
+xyplot(y ~ x | f, panel = function (x, y,...){
+  panel.xyplot(x, y,...)
+  panel.lmline(x, y , col = 2)
+})
+```
+
+```{r}
+
+xyplot(y ~ x | f, layout = c(2,1)  )
+
+```
+
+
+```{r}
+xyplot(Ozone~Wind, data=airquality,  pch = 8,col = "red", main = "Big Apple Data")
+```
+
