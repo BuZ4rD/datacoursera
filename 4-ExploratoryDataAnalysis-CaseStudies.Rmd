@@ -1,0 +1,138 @@
+---
+title: "EDA_AirPollutionCaseStudy"
+author: "Mathias"
+date: "13/09/2020"
+output: html_document
+---
+
+Clean air act to reduce the pollution in state.
+
+### The Question :
+Is the pollution lower than before ?
+
+- Look data in 1999 and look today's data
+
+
+```{r setup, include=FALSE}
+dat2008 <- read.csv("./data/hourly_88101_2008.csv", comment.char = "#", header = TRUE, sep = ",", na.strings = "") 
+
+dim(dat2008)
+head(dat2008)
+
+```
+```{r}
+dat2012 <- read.csv("./data/hourly_88101_2012.csv", comment.char = "#", header = TRUE, sep = ",", na.strings = "") 
+
+dim(dat2012)
+head(dat2012)
+```
+
+
+```{r}
+x0 <- dat2008$Sample.Measurement
+class(x0)
+summary(x0)
+
+```
+
+```{r}
+x1 <- dat2012$Sample.Measurement
+class(x1)
+summary(x1)
+```
+No NA in the data
+
+```{r}
+
+boxplot(x0,x1)
+```
+```{r}
+boxplot(log10(x0),log10(x1))
+```
+```{r}
+negative <- x1<0
+mean(negative, na.rm = TRUE)
+```
+negative value can be ignored
+
+```{r}
+dates <- dat2012$Date.GMT
+str(dates)
+dates<- as.Date(dates)
+str(dates)
+hist(dates, "month")
+```
+
+
+
+
+```{r}
+hist(dates[negative], "month")
+```
+```{r}
+head(dat2008)
+unique(dat2008$County.Name)
+site0 <- unique(subset(dat2008 , State.Code == 6, c(County.Code, Site.Num)))
+site1 <- unique(subset(dat2012 , State.Code == 6, c(County.Code, Site.Num)))
+```
+
+```{r}
+site0 <- paste(site0[,1], site0[,2], sep = ".")
+site1 <- paste(site1[,1], site1[,2], sep = ".")
+site0
+
+both <- intersect(site0,site1)
+both
+
+
+dat2008$county.site <- with (dat2008, paste(County.Code, Site.Num, sep = "."))
+dat2012$county.site <- with (dat2012, paste(County.Code, Site.Num, sep = "."))
+
+
+cnt0 <- subset(dat2008, State.Code == 6 & county.site %in% both)
+cnt1 <- subset(dat2012, State.Code == 6 & county.site %in% both)
+
+cnt0
+```
+```{r}
+split(cnt0, cnt0$county.site)
+sapply(split(cnt0, cnt0$county.site), nrow)
+```
+```{r}
+sapply(split(cnt1, cnt1$county.site), nrow)
+```
+```{r}
+pm0sub <- subset(dat2008, State.Code == 6 & County.Code == 73 & Site.Num == 1201 )
+pm1sub <- subset(dat2012, State.Code == 6 & County.Code == 73 & Site.Num == 1201 )
+
+dim(pm0sub)
+dim(pm1sub)
+
+```
+```{r}
+dates1 <- as.Date(pm1sub$Date.GMT)
+dates0 <- as.Date(pm0sub$Date.GMT)
+
+x0sub <- pm0sub$Sample.Measurement
+x1sub <- pm1sub$Sample.Measurement
+```
+
+```{r, figures-side, fig.show="hold", out.width="50%"}
+rng <- range(x0sub, x1sub, na.rm = T)
+par(mfrow = c(1,2), mar = c(4,4,2,1))
+plot(dates0, x0sub, pch=20, ylim = rng)
+abline(h = median(x0sub, na.rm = T, col = "red"))
+plot(dates1, x1sub, pch=20, ylim = rng)
+abline(h = median(x1sub, na.rm = T))
+```
+```{r}
+
+
+mean0 <- with (dat2008, tapply(Sample.Measurement, State.Code, mean, na.rm = T))
+
+head(mean0)
+mean1 <- with (dat2012, tapply(Sample.Measurement, State.Code, mean, na.rm = T))
+
+summary(mean1)
+```
+d0 <- data.frame(state = names  )
